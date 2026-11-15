@@ -86,7 +86,7 @@ jobs:
             cp "$dir/kodo" "dist/kodo-$TARGET"
             cp "$dir/kodo-app" "dist/kodo-app-$TARGET"
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.target }}
           path: dist/*
@@ -96,7 +96,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: aarch64-apple-darwin
           path: dist
@@ -131,7 +131,7 @@ jobs:
           </dict></plist>
           PLIST
           hdiutil create -volname Kodo -srcfolder Kodo.app -ov -format UDZO dist/kodo-aarch64-apple-darwin.dmg
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-dmg
           path: dist/kodo-aarch64-apple-darwin.dmg
@@ -141,7 +141,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: x86_64-pc-windows-msvc
           path: dist
@@ -160,7 +160,7 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/out"
           wix build -arch x64 -d Version="$version" -d BinDir="$bin" \
             -o "$GITHUB_WORKSPACE/out/kodo-x86_64-pc-windows-msvc.msi" kodo.wxs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: msi
           path: out/*.msi
@@ -182,7 +182,7 @@ jobs:
       RUNTIME: https://github.com/AppImage/type2-runtime/releases/download/20251108
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: ${{ matrix.target }}
           path: dist
@@ -207,7 +207,7 @@ jobs:
           mkdir -p out
           ARCH=${{ matrix.arch }} ./appimagetool --appimage-extract-and-run --runtime-file runtime \
             "$app" "out/kodo-${{ matrix.arch }}.AppImage"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: appimage-${{ matrix.arch }}
           path: out/*.AppImage
@@ -216,7 +216,7 @@ jobs:
     needs: [build, macos-dmg, msi, appimage]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
