@@ -1,0 +1,46 @@
+[
+  {
+    "id": 437732875,
+    "tag_name": "v0.9.2",
+    "name": "v0.9.2",
+    "draft": false,
+    "prerelease": false,
+    "html_url": "https://github.com/Cidan/BetterBags/releases/tag/v0.9.2",
+    "published_at": "2026-11-07T17:38:50Z",
+    "body": "Introduces dynamic bag autosizing, right-click backpack sorting, and the new Rainy Window glass theme for BetterBags Next.\r\n\r\n## New\r\n\r\n- **Autosize Bags setting for small bags**: A new Autosize Bags ",
+    "assets": [
+      {
+        "name": "BetterBags-v0.9.2.zip",
+        "size": 3354981,
+        "browser_download_url": "{{base}}/Cidan/BetterBags/releases/download/v0.9.2/BetterBags-v0.9.2.zip"
+      },
+      {
+        "name": "release.json",
+        "size": 309,
+        "browser_download_url": "{{base}}/Cidan/BetterBags/releases/download/v0.9.2/release.json"
+      }
+    ]
+  },
+  {
+    "id": 436025023,
+    "tag_name": "v0.9.1",
+    "name": "v0.9.1",
+    "draft": false,
+    "prerelease": false,
+    "html_url": "https://github.com/Cidan/BetterBags/releases/tag/v0.9.1",
+    "published_at": "2026-11-06T02:17:18Z",
+    "body": "This update prevents text truncation in small Next panels and fixes an error when consuming items while bags are closed.\r\n\r\n## Improved\r\n\r\n- **Text fitting for small panels**: Small BetterBags Next pa",
+    "assets": [
+      {
+        "name": "BetterBags-v0.9.1.zip",
+        "size": 3284516,
+        "browser_download_url": "{{base}}/Cidan/BetterBags/releases/download/v0.9.1/BetterBags-v0.9.1.zip"
+      },
+      {
+        "name": "release.json",
+        "size": 309,
+        "browser_download_url": "{{base}}/Cidan/BetterBags/releases/download/v0.9.1/release.json"
+      }
+    ]
+  }
+]

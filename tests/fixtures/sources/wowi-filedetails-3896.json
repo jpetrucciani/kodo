@@ -1,0 +1,26 @@
+[
+  {
+    "id": 3896,
+    "categoryId": 24,
+    "version": "v1.54.07",
+    "lastUpdate": 1794416784000,
+    "checksum": "35fe132f686b93594ed5a09ea88fc49e",
+    "fileName": "Atlas-v1.54.07.zip",
+    "downloadUri": "https://cdn.wowinterface.com/downloads/getfile.php?id=3896&d=1794416784&minion",
+    "pendingUpdate": 0,
+    "title": "Atlas",
+    "author": "arith",
+    "description": "[URL=\"https://www.paypal.me/ArithHsu\"]Make a Donation via Paypal[/URL]\r\n\r\n[COLOR=SlateGray]Atlas, a World of Warcraft in",
+    "changeLog": "[size=\"6\"]Atlas, a World of Warcraft instance map browser[/size]\r\n\r\n[list]\r\n[*]Copyright 2005 ~ 2010 - Dan Gilbert\r\n[*]C",
+    "downloads": 4728176,
+    "downloadsMonthly": 704,
+    "favorites": 5328,
+    "images": [
+      {
+        "thumbUrl": "https://cdn-wow.mmoui.com/preview/tiny/pvw51580.png",
+        "imageUrl": "https://cdn-wow.mmoui.com/preview/pvw51580.png",
+        "description": "Atlas v1.20.0"
+      }
+    ]
+  }
+]

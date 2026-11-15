@@ -1,0 +1,11 @@
+.db
+.direnv
+/result*
+
+# rust
+debug/
+target/
+**/*.rs.bk
+*.pdb
+
+tmp

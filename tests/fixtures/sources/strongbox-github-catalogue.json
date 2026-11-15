@@ -1,0 +1,71 @@
+{
+  "spec": {
+    "version": 2
+  },
+  "datestamp": "2026-11-14",
+  "total": 5,
+  "addon-summary-list": [
+    {
+      "description": "TOSUI",
+      "download-count": 32,
+      "game-track-list": ["retail"],
+      "label": "TOSUI",
+      "name": "tosui",
+      "source": "github",
+      "source-id": "0kamiyasha/TOSUI",
+      "url": "https://github.com/0kamiyasha/TOSUI",
+      "updated-date": "2026-08-12T21:08:27Z"
+    },
+    {
+      "description": "Modular and lightweight approach to providing you with the tools you need to beat any boss encounter.",
+      "download-count": 2636430,
+      "game-track-list": [
+        "classic",
+        "classic-cata",
+        "classic-mists",
+        "classic-tbc",
+        "classic-wotlk",
+        "forever",
+        "retail"
+      ],
+      "label": "BigWigs",
+      "name": "bigwigs",
+      "source": "github",
+      "source-id": "BigWigsMods/BigWigs",
+      "url": "https://github.com/BigWigsMods/BigWigs",
+      "updated-date": "2026-11-08T20:38:50Z"
+    },
+    {
+      "description": "A total replacement AddOn for World of Warcraft bag frames, inspired by AdiBags.",
+      "download-count": 220340,
+      "game-track-list": ["classic", "classic-mists", "classic-tbc", "forever", "retail"],
+      "label": "BetterBags",
+      "name": "betterbags",
+      "source": "github",
+      "source-id": "Cidan/BetterBags",
+      "url": "https://github.com/Cidan/BetterBags",
+      "updated-date": "2026-11-07T17:38:50Z"
+    },
+    {
+      "download-count": 1463,
+      "game-track-list": ["classic-tbc"],
+      "label": "sheepdog",
+      "name": "sheepdog",
+      "source": "github",
+      "source-id": "2072/sheepdog",
+      "url": "https://github.com/2072/sheepdog",
+      "updated-date": "2026-01-24T22:37:04Z"
+    },
+    {
+      "description": "Sheepdog Arena Frames: enemy arena frames for WoW TBC Anniversary, built for a mage",
+      "download-count": 35,
+      "game-track-list": ["classic-tbc"],
+      "label": "Sheepdog",
+      "name": "sheepdog",
+      "source": "github",
+      "source-id": "frostbolt/Sheepdog",
+      "url": "https://github.com/frostbolt/Sheepdog",
+      "updated-date": "2026-11-02T19:28:24Z"
+    }
+  ]
+}

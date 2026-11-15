@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=kodo
+GenericName=WoW Addon Manager
+Comment=Install and update World of Warcraft addons
+Exec=kodo-app
+Icon=dev.cobi.kodo
+Terminal=false
+Categories=Game;
+StartupWMClass=dev.cobi.kodo

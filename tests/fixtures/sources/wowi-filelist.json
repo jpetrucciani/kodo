@@ -1,0 +1,51 @@
+[
+  {
+    "id": 3826,
+    "categoryId": 19,
+    "version": "11.0.2.3",
+    "lastUpdate": 1724089877000,
+    "addonStatus": "Live",
+    "title": "CTMod",
+    "author": "DahkCeles",
+    "fileInfoUri": "https://www.wowinterface.com/downloads/info3826-CTMod.html",
+    "downloads": 598690,
+    "downloadsMonthly": 58,
+    "favorites": 695,
+    "gameVersions": ["11.0.2", "4.4.0", "1.15.2"],
+    "checksum": "801d2daf73ad195c02c58d50be7f1b22",
+    "addons": null
+  },
+  {
+    "id": 3896,
+    "categoryId": 24,
+    "version": "v1.54.07",
+    "lastUpdate": 1794416784000,
+    "addonStatus": "Live",
+    "title": "Atlas",
+    "author": "arith",
+    "fileInfoUri": "https://www.wowinterface.com/downloads/info3896-Atlas.html",
+    "downloads": 4728176,
+    "downloadsMonthly": 704,
+    "favorites": 5328,
+    "gameVersions": ["12.1.0", "1.15.7", "4.4.2", "2.5.4"],
+    "checksum": "35fe132f686b93594ed5a09ea88fc49e",
+    "addons": null,
+    "donationUrl": "https://www.wowinterface.com/downloads/info3896#donate"
+  },
+  {
+    "id": 5541,
+    "categoryId": 26,
+    "version": "v8.13.14",
+    "lastUpdate": 1672075548000,
+    "addonStatus": "Live",
+    "title": "AtlasLoot Enhanced",
+    "author": "Hegarol",
+    "fileInfoUri": "https://www.wowinterface.com/downloads/info5541-AtlasLootEnhanced.html",
+    "downloads": 7902815,
+    "downloadsMonthly": 202,
+    "favorites": 6546,
+    "gameVersions": ["10.0.2"],
+    "checksum": "59724e5c596ecedb8237cf3066c0332e",
+    "addons": null
+  }
+]

@@ -1,0 +1,236 @@
+name: release
+# Runs for a pushed v* tag, or from autotag.yml when a version bump lands on main. Either way
+# every job builds the commit the tag points at (github.sha), and TAG names the release.
+on:
+  push:
+    tags: ['v*']
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag to release, e.g. v0.2.0 (already pushed)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  TAG: ${{ inputs.tag || github.ref_name }}
+  # Fail the release if a binary grows past this (spec: goal 20 MB, hard limit 25 MB).
+  MAX_BINARY_BYTES: 26214400
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      # The app compares its own version with the latest release to offer updates, so the tag
+      # has to match the workspace version.
+      - name: Tag matches Cargo.toml
+        run: |
+          want="v$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "kodo-app") | .version')"
+          if [ "$TAG" != "$want" ]; then
+            echo "::error::tag $TAG does not match workspace version $want"
+            exit 1
+          fi
+
+  build:
+    needs: [checks, version]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-latest, target: x86_64-apple-darwin }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: rustup target add ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+      - run: cargo build --release --locked --target ${{ matrix.target }} -p kodo-cli -p kodo-app
+      - name: Check binary size
+        shell: bash
+        run: |
+          dir=target/${{ matrix.target }}/release
+          for bin in kodo kodo-app; do
+            f="$dir/$bin"; [ -f "$f.exe" ] && f="$f.exe"
+            size=$(wc -c < "$f")
+            echo "$bin: $size bytes"
+            if [ "$size" -gt "$MAX_BINARY_BYTES" ]; then echo "::error::$bin is $size bytes"; exit 1; fi
+          done
+      - name: Package
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          dir="target/$TARGET/release"
+          name="kodo-$TARGET"
+          mkdir -p dist "$name"
+          cp LICENSE "$name/"
+          # An archive per target, plus each binary on its own for a no-unzip download.
+          if [[ "$TARGET" == *windows* ]]; then
+            cp "$dir/kodo.exe" "$dir/kodo-app.exe" "$name/"
+            7z a "dist/$name.zip" "$name" > /dev/null
+            cp "$dir/kodo.exe" "dist/kodo-$TARGET.exe"
+            cp "$dir/kodo-app.exe" "dist/kodo-app-$TARGET.exe"
+          else
+            cp "$dir/kodo" "$dir/kodo-app" "$name/"
+            tar czf "dist/$name.tar.gz" "$name"
+            cp "$dir/kodo" "dist/kodo-$TARGET"
+            cp "$dir/kodo-app" "dist/kodo-app-$TARGET"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: dist/*
+
+  macos-dmg:
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Universal Kodo.app in a dmg (unsigned; right-click → Open on first launch)
+        run: |
+          for t in aarch64-apple-darwin x86_64-apple-darwin; do tar xzf "dist/kodo-$t.tar.gz"; done
+          app=Kodo.app/Contents
+          mkdir -p "$app/MacOS"
+          lipo -create kodo-aarch64-apple-darwin/kodo-app kodo-x86_64-apple-darwin/kodo-app -output "$app/MacOS/kodo-app"
+          lipo -create kodo-aarch64-apple-darwin/kodo kodo-x86_64-apple-darwin/kodo -output "$app/MacOS/kodo"
+          mkdir -p "$app/Resources" kodo.iconset
+          src=crates/kodo-app/assets/icon/kodo.png
+          for s in 16 32 128 256; do
+            sips -z $s $s "$src" --out "kodo.iconset/icon_${s}x${s}.png" >/dev/null
+            sips -z $((s * 2)) $((s * 2)) "$src" --out "kodo.iconset/icon_${s}x${s}@2x.png" >/dev/null
+          done
+          cp "$src" kodo.iconset/icon_512x512.png
+          iconutil -c icns kodo.iconset -o "$app/Resources/kodo.icns"
+          version="${GITHUB_REF_NAME#v}"
+          cat > "$app/Info.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>CFBundleName</key><string>Kodo</string>
+            <key>CFBundleIdentifier</key><string>dev.cobi.kodo</string>
+            <key>CFBundleExecutable</key><string>kodo-app</string>
+            <key>CFBundleIconFile</key><string>kodo</string>
+            <key>CFBundleShortVersionString</key><string>${version}</string>
+            <key>CFBundlePackageType</key><string>APPL</string>
+            <key>LSMinimumSystemVersion</key><string>11.0</string>
+            <key>NSHighResolutionCapable</key><true/>
+          </dict></plist>
+          PLIST
+          hdiutil create -volname Kodo -srcfolder Kodo.app -ov -format UDZO dist/kodo-universal-apple-darwin.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: dist/kodo-universal-apple-darwin.dmg
+
+  msi:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: x86_64-pc-windows-msvc
+          path: dist
+      # WiX v5 is the last release under plain MS-RL; v6+ adds the Open Source Maintenance Fee EULA.
+      - run: dotnet tool install --global wix --version 5.0.2
+      - name: Build the MSI
+        shell: bash
+        working-directory: crates/kodo-app/assets
+        run: |
+          # MSI versions are numeric only, so v1.2.0-rc.1 installs as 1.2.0.
+          version="${GITHUB_REF_NAME#v}"
+          version="${version%%-*}"
+          bin="$GITHUB_WORKSPACE/dist"
+          mv "$bin/kodo-app-x86_64-pc-windows-msvc.exe" "$bin/kodo-app.exe"
+          mv "$bin/kodo-x86_64-pc-windows-msvc.exe" "$bin/kodo.exe"
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          wix build -arch x64 -d Version="$version" -d BinDir="$bin" \
+            -o "$GITHUB_WORKSPACE/out/kodo-x86_64-pc-windows-msvc.msi" kodo.wxs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msi
+          path: out/*.msi
+
+  appimage:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x86_64
+            target: x86_64-unknown-linux-gnu
+            tool_sha: ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0
+            runtime_sha: 2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d
+          - os: ubuntu-24.04-arm
+            arch: aarch64
+            target: aarch64-unknown-linux-gnu
+            tool_sha: f0837e7448a0c1e4e650a93bb3e85802546e60654ef287576f46c71c126a9158
+            runtime_sha: 00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444
+    runs-on: ${{ matrix.os }}
+    env:
+      APPIMAGETOOL: https://github.com/AppImage/appimagetool/releases/download/1.9.1
+      RUNTIME: https://github.com/AppImage/type2-runtime/releases/download/20251108
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: dist
+      - name: Fetch appimagetool and the runtime (pinned, checksummed)
+        run: |
+          curl -fsSL -o appimagetool "$APPIMAGETOOL/appimagetool-${{ matrix.arch }}.AppImage"
+          curl -fsSL -o runtime "$RUNTIME/runtime-${{ matrix.arch }}"
+          printf '%s  appimagetool\n%s  runtime\n' "${{ matrix.tool_sha }}" "${{ matrix.runtime_sha }}" | sha256sum -c
+          chmod +x appimagetool
+      # Only the app goes in: the graphics and windowing libs iced loads at runtime (Wayland,
+      # X11, Vulkan, GL) come from the host, as AppImage expects for those.
+      - name: Build the AppImage
+        run: |
+          assets=crates/kodo-app/assets
+          app=AppDir
+          install -Dm755 "dist/kodo-app-${{ matrix.target }}" "$app/usr/bin/kodo-app"
+          install -Dm644 "$assets/dev.cobi.kodo.desktop" "$app/usr/share/applications/dev.cobi.kodo.desktop"
+          install -Dm644 "$assets/icon/kodo.png" "$app/usr/share/icons/hicolor/512x512/apps/dev.cobi.kodo.png"
+          cp "$assets/dev.cobi.kodo.desktop" "$app/"
+          cp "$assets/icon/kodo.png" "$app/dev.cobi.kodo.png"
+          ln -s usr/bin/kodo-app "$app/AppRun"
+          mkdir -p out
+          ARCH=${{ matrix.arch }} ./appimagetool --appimage-extract-and-run --runtime-file runtime \
+            "$app" "out/kodo-${{ matrix.arch }}.AppImage"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: appimage-${{ matrix.arch }}
+          path: out/*.AppImage
+
+  publish:
+    needs: [build, macos-dmg, msi, appimage]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - run: cd dist && sha256sum -- * > SHA256SUMS
+      # Prerelease tags (v1.2.0-rc.1) publish as prereleases, which the app's update check skips.
+      - run: |
+          pre=(); [[ "$TAG" == *-* ]] && pre=(--prerelease)
+          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --title "$TAG" --generate-notes --verify-tag "${pre[@]}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,41 @@
+<!--
+  Windows installer, built by release.yml with WiX v5:
+    wix build -arch x64 -d Version=1.2.3 -d BinDir=<dir with both exes> -o kodo.msi kodo.wxs
+  Installs both binaries to Program Files\kodo, adds a Start menu shortcut for the app and puts
+  the folder on PATH for the CLI. Keep UpgradeCode fixed forever: it's how a newer MSI finds and
+  replaces an older one.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="kodo"
+    Manufacturer="kodo"
+    Version="$(Version)"
+    UpgradeCode="C790A676-BF5B-4D4B-B0D0-8F0E979241B6"
+    Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of kodo is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="kodo.ico" SourceFile="icon\kodo.ico" />
+    <Property Id="ARPPRODUCTICON" Value="kodo.ico" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/jpetrucciani/kodo" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="kodo">
+        <Component>
+          <File Source="$(BinDir)\kodo-app.exe" KeyPath="yes" />
+        </Component>
+        <Component>
+          <File Source="$(BinDir)\kodo.exe" KeyPath="yes" />
+          <Environment Id="Path" Name="PATH" Value="[INSTALLFOLDER]" Action="set" Part="last" System="yes" Permanent="no" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Id="StartMenu" Name="kodo" Description="WoW addon manager" Target="[INSTALLFOLDER]kodo-app.exe" WorkingDirectory="INSTALLFOLDER" Icon="kodo.ico" />
+        <RegistryValue Root="HKMU" Key="Software\kodo" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+  </Package>
+</Wix>
