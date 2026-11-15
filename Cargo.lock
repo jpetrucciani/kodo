@@ -2370,7 +2370,7 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
 name = "kodo-app"
-version = "0.1.0-rc.1"
+version = "0.1.0-rc.2"
 dependencies = [
  "embed-resource",
  "iced",
@@ -2385,7 +2385,7 @@ dependencies = [
 
 [[package]]
 name = "kodo-cli"
-version = "0.1.0-rc.1"
+version = "0.1.0-rc.2"
 dependencies = [
  "anyhow",
  "clap",
@@ -2399,7 +2399,7 @@ dependencies = [
 
 [[package]]
 name = "kodo-core"
-version = "0.1.0-rc.1"
+version = "0.1.0-rc.2"
 dependencies = [
  "async-trait",
  "directories",
@@ -2416,7 +2416,7 @@ dependencies = [
 
 [[package]]
 name = "kodo-sources"
-version = "0.1.0-rc.1"
+version = "0.1.0-rc.2"
 dependencies = [
  "async-trait",
  "kodo-core",

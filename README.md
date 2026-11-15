@@ -19,8 +19,8 @@ Grab the latest build from [Releases](https://github.com/jpetrucciani/kodo/relea
 | OS      | File                                                                            |
 | ------- | ------------------------------------------------------------------------------- |
 | Windows | `.msi` installer, or the standalone `kodo-app-x86_64-pc-windows-msvc.exe`       |
-| macOS   | `kodo-universal-apple-darwin.dmg` (unsigned: right-click → Open the first time) |
-| Linux   | `kodo-x86_64.AppImage` / `kodo-aarch64.AppImage`, or the tarballs               |
+| macOS   | `kodo-aarch64-apple-darwin.dmg`, Apple silicon (unsigned: right-click → Open the first time) |
+| Linux   | `kodo-x86_64.AppImage`, or the tarball |
 | Nix     | `nix-build https://github.com/jpetrucciani/kodo/archive/main.tar.gz -A kodo`    |
 
 Run `kodo-app` for the GUI and `kodo` for the CLI. A `portable.txt` next to the executable (or `--portable`) keeps all of kodo's data in a `kodo-data` folder beside it.
